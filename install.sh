@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 GREEN='\033[0;32m'
@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo -e "${BLUE}===========================================${NC}"
-echo -e "${BLUE}    Fedora 44 XFCE -> Windows 10 22H2     ${NC}"
+echo -e "${BLUE}    Fedora 44 XFCE -> Windows 10 22H2${NC}"
 echo -e "${BLUE}===========================================${NC}"
 
 echo -e "\n${YELLOW}[1/5] Instalando dependências do sistema...${NC}"

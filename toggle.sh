@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 
 STATE_FILE="$HOME/.config/undercover_state"
 WALLPAPER_WIN="$HOME/.local/share/backgrounds/win10-22h2.jpg"
