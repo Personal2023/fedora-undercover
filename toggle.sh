@@ -1,10 +1,10 @@
 ﻿#!/usr/bin/env bash
 
-STATE_FILE="\C:\Users\ADM/.config/undercover_state"
-WALLPAPER_WIN="\C:\Users\ADM/.local/share/backgrounds/win10-22h2.jpg"
+STATE_FILE="$HOME/.config/undercover_state"
+WALLPAPER_WIN="$HOME/.local/share/backgrounds/win10-22h2.jpg"
 
 apply_windows() {
-    touch "\"
+    touch "$STATE_FILE"
 
     xfconf-query -c xsettings -p /Gtk/FontName -s "Segoe UI 9"
     xfconf-query -c xsettings -p /Gtk/MonospaceFontName -s "Consolas 10"
@@ -16,9 +16,9 @@ apply_windows() {
 
     xfconf-query -c xsettings -p /Net/IconThemeName -s "Windows-10"
 
-    DESK_PROPS=\
-    for prop in \; do
-        xfconf-query -c xfce4-desktop -p "\" -s "\"
+    DESK_PROPS=$(xfconf-query -c xfce4-desktop -l | grep "last-image")
+    for prop in $DESK_PROPS; do
+        xfconf-query -c xfce4-desktop -p "$prop" -s "$WALLPAPER_WIN"
     done
 
     xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=8;x=0;y=0"
@@ -29,7 +29,7 @@ apply_windows() {
 }
 
 restore_fedora() {
-    rm -f "\"
+    rm -f "$STATE_FILE"
 
     xfconf-query -c xsettings -p /Gtk/FontName -s "Cantarell 10"
     xfconf-query -c xsettings -p /Gtk/MonospaceFontName -s "Source Code Pro 10"
@@ -42,7 +42,7 @@ restore_fedora() {
     notify-send "Modo Undercover" "Visual Fedora padrão restaurado!" 2>/dev/null || true
 }
 
-if [ -f "\" ]; then
+if [ -f "$STATE_FILE" ]; then
     restore_fedora
 else
     apply_windows
