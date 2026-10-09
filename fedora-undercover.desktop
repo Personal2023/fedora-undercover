@@ -1,0 +1,10 @@
+﻿[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Fedora Undercover
+GenericName=Alternar Tema Windows 10
+Comment=Transforma o visual do Fedora XFCE em Windows 10 22H2
+Exec=/bin/bash -c "\C:\Users\ADM/.local/bin/fedora-undercover"
+Icon=preferences-desktop-theme
+Terminal=false
+Categories=Settings;DesktopSettings;
