@@ -28,6 +28,7 @@ sudo dnf install -y \
   xfconf \
   xfce4-panel \
   xfce4-whiskermenu-plugin \
+  xfce4-screenshooter \
   wget2 \
   curl \
   unzip \
@@ -114,10 +115,10 @@ done
 # ------------------------------------------------------------------------------
 # 6. Reestruturação do Painel (Windows 10 22H2 Taskbar)
 # ------------------------------------------------------------------------------
-echo -e "\n[6/6] Configurando barra de tarefas e Whisker Menu..."
+echo -e "\n[6/6] Configurando barra de tarefas (layout estilo Windows 10)..."
 
-# 6.1 Eliminar painéis secundários (ex: dock padrão do Fedora)
-ALL_PANELS=$(xfconf-query -c xfce4-panel -p /panels | grep -E '^[0-9]+$' || true)
+# 6.1 Eliminar painéis secundários (ex: dock padrão inferior do Fedora)
+ALL_PANELS=$(xfconf-query -c xfce4-panel -p /panels \vert{} grep -E '^[0-9]+$' || true)
 for p in $ALL_PANELS; do
   if [ "$p" -ne 1 ]; then
     xfconf-query -c xfce4-panel -p "/panels/panel-$p" -r -R 2>/dev/null || true
@@ -133,43 +134,5 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 40 --create -t int
 xfconf-query -c xfce4-panel -p /panels/panel-1/icon-size -s 24 --create -t int
 xfconf-query -c xfce4-panel -p /panels/panel-1/locked -s true --create -t bool
 
-# 6.3 Substituição do menu clássico pelo Whisker Menu (plugin-1)
-OLD_MENU=$(xfconf-query -c xfce4-panel -p /plugins -lv 2>/dev/null | awk '$2 ~ /applicationsmenu/ {print $1}' | grep -o 'plugin-[0-9]*' || true)
-if [ -n "$OLD_MENU" ]; then
-  xfconf-query -c xfce4-panel -p "/plugins/$OLD_MENU" -r -R 2>/dev/null || true
-fi
-
-# Configuração do Whisker Menu com ícone do Windows
-xfconf-query -c xfce4-panel -p /plugins/plugin-1 -s "whiskermenu" --create -t string
-xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-icon -s "distributor-logo-windows" --create -t string
-xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-title -s "" --create -t string
-xfconf-query -c xfce4-panel -p /plugins/plugin-1/show-button-title -s false --create -t bool
-xfconf-query -c xfce4-panel -p /plugins/plugin-1/show-button-icon -s true --create -t bool
-
-# Garante que o Whisker Menu seja o primeiro item da barra
-CURRENT_IDS=$(xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids 2>/dev/null | grep -v "^$" | grep -v "^1$" || true)
-CMD_ARRAY="xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -a -t int -s 1"
-for id in $CURRENT_IDS; do
-  CMD_ARRAY="$CMD_ARRAY -t int -s $id"
-done
-eval "$CMD_ARRAY" --force-array
-
-# 6.4 Relógio no padrão Windows 10 (HH:MM na linha superior, DD/MM/AAAA na inferior)
-CLOCK_ID=$(xfconf-query -c xfce4-panel -p /plugins -lv 2>/dev/null | awk '$2 ~ /clock/ {print $1}' | grep -o 'plugin-[0-9]*' | head -n 1 || true)
-if [ -n "$CLOCK_ID" ]; then
-  xfconf-query -c xfce4-panel -p "/plugins/$CLOCK_ID/mode" -s 4 --create -t int
-  xfconf-query -c xfce4-panel -p "/plugins/$CLOCK_ID/digital-format" -s "%H:%M%n%d/%m/%Y" --create -t string
-fi
-
-# Limpeza dos temporários
-rm -rf "$TEMP_DIR"
-
-# ------------------------------------------------------------------------------
-# 7. Recarregamento da Interface
-# ------------------------------------------------------------------------------
-echo -e "\nRecarregando componentes visuais do XFCE..."
-xfsettingsd --replace >/dev/null 2>&1 &
-xfwm4 --replace >/dev/null 2>&1 &
-xfce4-panel -r >/dev/null 2>&1 &
-
-echo -e "\n[+] Concluído com sucesso! Ambiente atualizado para Windows 10 22H2."
+# 6.3 Remover itens indesejados (Menu clássico, lançadores soltos e botão de usuário)
+for plugin in $(xfconf-query -c xfce4-panel -p /plugins -lv 2>/dev/null | awk '$2 ~ /(applicationsmenu|launcher|actions)/ {print $1}');
